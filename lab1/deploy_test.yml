@@ -1,4 +1,4 @@
-- name: Deploy Production Server
+- name: Deploy Test Server
   hosts: test
   become: true
   tasks:

@@ -1,3 +1,7 @@
+#Author: Nssa Group 6 operations team
+#Purpose: To deploy to the test server: install apache open port 80 and install the explore california website
+#Date: 9/16/2023
+#Version: 1.0
 - name: Deploy Test Server
   hosts: test
   become: true

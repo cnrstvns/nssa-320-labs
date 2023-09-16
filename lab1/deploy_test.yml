@@ -1,0 +1,80 @@
+- name: Deploy Production Server
+  hosts: test
+  become: true
+  tasks:
+    - name: Install Apache
+      yum:
+        name: httpd
+        state: present
+
+    - name: Start Apache
+      ansible.builtin.service:
+        name: httpd
+        state: started
+
+    - name: Enable Apache
+      ansible.builtin.service:
+        name: httpd
+        enabled: true
+
+    - name: Open HTTP Port 80
+      firewalld:
+        service: http
+        permanent: true
+        state: enabled
+
+    - name: Reload Firewall
+      ansible.builtin.command: firewall-cmd --reload
+
+    - name: Ensure Git is installed
+      ansible.builtin.yum:
+        name: git
+        state: present
+
+    - name: Remove existing repository
+      ansible.builtin.file:
+        path: /home/student/Documents/labs
+        state: absent
+
+    - name: Download website
+      ansible.builtin.git:
+        repo: https://github.com/cnrstvns/nssa-320-labs
+        dest: /path/to/destination
+        clone: true
+        update: true
+        force: true
+
+    - name: Find files to Remove
+      ansible.builtin.find:
+        paths: /var/www/html/
+        recurse: true
+        file_type: any
+      register: items_to_remove
+
+    - name: Remove old site files
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      with_items: "{{ items_to_remove.files }}"
+
+    - name: Remove old site directories
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      with_items: "{{ items_to_remove.directories }}"
+      when: items_to_remove.directories is defined
+
+    - name: Move site files
+      ansible.builtin.shell:
+        cmd: mv -f /home/student/Documents/labs/explore_california/* /var/www/html/
+      args:
+        warn: false
+
+    - name: Update permissions
+      ansible.builtin.command: chcon -R -t httpd_sys_content_t /var/www/html/
+      become: true
+
+    - name: Restart Apache
+      ansible.builtin.service:
+        name: httpd
+        state: restarted

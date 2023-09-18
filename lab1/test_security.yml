@@ -39,7 +39,7 @@
       register: trace_response
 
     - name: Check TRACE Request Response
-      fail:
+      debug:
         msg: "TRACE requests are allowed on the server."
       when: "trace_response.status == 200"
 

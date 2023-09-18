@@ -34,3 +34,22 @@
       register: directory_listing_after_result
       ignore_errors: yes
 
+    - name: Attempt to Fetch Server Signature After Security
+    shell: curl -I http://192.168.206.151/
+    register: server_signature_after_result
+    ignore_errors: yes
+
+- name: Test ETag Information Access
+  hosts: your_web_servers
+  tasks:
+    - name: Make HTTP Request to Check ETag
+      uri:
+        url: "http://example.com/some-resource"  # Replace with the actual URL you want to test.
+        method: HEAD  # Used to retrieve headers only
+      register: http_response
+
+    - name: Debug ETag Header
+      debug:s
+        var: http_response.headers.ETag
+      when: "'ETag' in http_response.headers"
+

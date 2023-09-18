@@ -51,7 +51,7 @@
       register: trace_response_result
 
     - name: Check Firewall Service Status
-      ansible.builtin.shell: "systemctl status firewalld | grep -oP 'Active: \\K\\W+'"
+      ansible.builtin.shell: "systemctl status firewalld | grep -oP 'Active: \\K\\w+'"
       register: firewall_status
 
     - name: Display Firewalld Status

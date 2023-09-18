@@ -9,14 +9,14 @@
   tasks:
     - name: Attempt Directory Listing
       ansible.builtin.uri:
-        url: "http://192.168.206.151/resources/"
+        url: "http://web-test/resources/"
         method: GET
       register: directory_listing_result
       ignore_errors: true
 
     - name: Attempt to get ETAG header
       ansible.builtin.uri:
-        url: "http://192.168.206.151"
+        url: "http://web-test"
         method: GET
       register: http_response
 
@@ -27,14 +27,14 @@
     # Both based on Test server IP
     - name: Attempt to Fetch Server Signature
       ansible.builtin.uri:
-        url: "http://192.168.206.151"
+        url: "http://web-test"
         method: GET
       register: server_signature_result
       ignore_errors: true
 
     - name: Send HTTP TRACE Request
       ansible.builtin.uri:
-        url: "http://192.168.206.151/index.html"
+        url: "http://web-test/index.html"
         method: TRACE
       register: http_trace_response
       ignore_errors: true

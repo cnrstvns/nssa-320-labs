@@ -23,7 +23,8 @@
         var: curl_response
 
     - name: "fail early"
-      fail: "Bruh because"
+      fail:
+        msg: "Bruh because"
 
     - name: Check for ETag Header
       ansible.builtin.debug:

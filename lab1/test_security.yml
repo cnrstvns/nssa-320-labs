@@ -62,5 +62,4 @@
         - "{{ server_signature_result }}"
         - "{{ http_response }}"
         - "{{ http_trace_response }}"
-
-       when: "'404 Not Found' not in item.stdout"
+      when: "'404 Not Found' not in item.stdout"

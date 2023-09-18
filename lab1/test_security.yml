@@ -18,14 +18,6 @@
       ansible.builtin.shell: "curl -I -s http://web-test"
       register: curl_response
 
-    - name: Print response
-      ansible.builtin.debug:
-        var: curl_response
-
-    - name: "fail early"
-      fail:
-        msg: "Bruh because"
-
     - name: Check for ETag Header
       ansible.builtin.debug:
         msg: "ETag header is {{ 'present' if 'ETag' in curl_response.stdout else 'not present' }}"

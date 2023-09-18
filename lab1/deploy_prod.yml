@@ -1,7 +1,8 @@
-#Author: Nssa Group 6 operations team
-#Purpose: To deploy to the production server, install apache open port 80 and install the explore california website
-#Date: 9/16/2023
-#Version: 1.0
+# Author: NSSA-320 Group 6 Operations Team
+# Purpose: To deploy to the production server, install apache open port 80 and install the explore california website
+# Date: 9/17/2023
+# Version: 1.1
+
 - name: Deploy Production Server
   hosts: production
   become: true
@@ -79,6 +80,70 @@
       become: true
 
     - name: Restart Apache
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+
+    # Security additions
+
+    # Prevent extraneous files from being exposed
+    - name: Disable directory listing
+      ansible.builtin.lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: "^\\s*Options"
+        line: "Options -Indexes"
+      notify: restart apache
+
+    # Prevent server information being sent in response headers
+    - name: Disable Server Signature
+      ansible.builtin.lineinfile:
+        dest: /etc/httpd/conf/httpd.conf
+        regexp: "^\\s*ServerSignature"
+        line: "ServerSignature Off"
+      notify: restart apache
+
+    # Combat cross-site tracing attacks
+    - name: Disable TRACE HTTP Request Method
+      ansible.builtin.lineinfile:
+        dest: /etc/httpd/conf/httpd.conf
+        regexp: "^\\s*TraceEnable"
+        line: "TraceEnable off"
+      notify: restart apache
+
+    # Prevent leaking extraneous file information
+    - name: Disable ETag Information
+      ansible.builtin.lineinfile:
+        dest: /etc/httpd/conf/httpd.conf
+        regexp: "^\\s*FileETag"
+        line: "FileETag None"
+      notify: restart apache
+
+    # Disable unused HTTP methods
+    - name: Disable Unnecessary HTTP Methods
+      ansible.builtin.lineinfile:
+        dest: /etc/httpd/conf/httpd.conf
+        regexp: "^\\s*<LimitExcept"
+        line: "<LimitExcept GET>"
+      notify: restart apache
+
+    # Disallow following symlinks
+    - name: Use SymLinksIfOwnerMatch
+      ansible.builtin.lineinfile:
+        dest: /etc/httpd/conf/httpd.conf
+        regexp: "^\\s*Options"
+        line: "Options SymLinksIfOwnerMatch"
+      notify: restart apache
+
+    # Limit the request size to prevent Denial-of-Service attacks
+    - name: Limit request size
+      ansible.builtin.lineinfile:
+        dest: /etc/httpd/conf/httpd.conf
+        regexp: "^\\s*LimitRequestBody"
+        line: "LimitRequestBody 102400"
+      notify: restart apache
+
+  handlers:
+    - name: Restart apache
       ansible.builtin.service:
         name: httpd
         state: restarted

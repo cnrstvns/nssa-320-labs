@@ -4,7 +4,7 @@
 # Version: 1.0
 
 - name: Security Vulnerabilities Test
-  hosts: web-test
+  hosts: test
   gather_facts: false
   tasks:
     - name: Attempt Directory Listing

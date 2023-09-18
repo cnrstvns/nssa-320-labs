@@ -4,25 +4,33 @@
  #Purpose: To test security vulnerabilities of our deployments
  #Date 9/17/2023
  #Version: 1.0
-  hosts: your_web_server
+  hosts: web-test
   gather_facts: no
   tasks:
     - name: Attempt Directory Listing
-      shell: curl -I http://your_server_ip/directory_with_no_index/
+      shell: curl -I http://192.168.206.151/directory_with_no_index/
       register: directory_listing_result
       ignore_errors: yes
 
+    #Both based on Test server IP
     - name: Attempt to Fetch Server Signature
-      shell: curl -I http://your_server_ip/
+      shell: curl -I http://192.168.206.151/
       register: server_signature_result
       ignore_errors: yes
-
-    # Add tasks for other vulnerability tests here
+#Tests above check for any vulnerabilities before security configutations are applied
 
 - name: Apply Secure Production Playbook
-  hosts: your_web_server
+  hosts: web-test
   gather_facts: no
   tasks:
     - name: Run secure-prod-web.yml playbook
       include_tasks: secure-prod-web.yml
+-name: Test Vulnerabilities After Applying Security
+  hosts: web-test
+  gather_facts: no
+  tasks:
+    - name: Attempt Directory Listing After Security
+      shell: curl -I http://192.168.206.151/directory_with_no_index/
+      register: directory_listing_after_result
+      ignore_errors: yes
 

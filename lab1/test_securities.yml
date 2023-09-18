@@ -68,7 +68,48 @@
         msg: "Cross-Site Tracing (XST) is possible!"
       when: "'TRACE' in http_trace_response.url"
 
+- name: Check Established Ports
+  hosts: your_target_hosts
+  gather_facts: no  # You can set this to 'yes' if you need facts, like IP addresses.
 
+    tasks:
+    
+- name: Get Established Ports with netstat
+    ansible.builtin.shell: "netstat -tuln | grep ESTABLISHED"
+    register: established_ports
+    changed_when: false  # Do not mark the task as changed regardless of the result.
+    name: Check Network Connectivity
+    hosts: your_target_hosts
+    gather_facts: no
+
+  tasks:
+    
+- name: Ping a Remote Host
+    ansible.builtin.ping:
+      data: "hello"
+    register: ping_result
+
+    
+- name: Display Ping Result
+    debug:
+      var: ping_result
+
+- name: Check Firewall Status
+  hosts: your_target_hosts
+  gather_facts: yes
+
+  tasks:
+    
+  - name: Check Firewall Service Status
+    ansible.builtin.service:
+      - name: firewalld  # Replace with the name of your firewall service if different (e.g., iptables).
+      state: started  # Specify 'started' to check if the service is running.
+    register: firewall_status
+
+    
+- name: Display Firewall Status
+    debug:
+      var: firewall_status
 - name: Report Results
   hosts: web-test
   gather_facts: no
@@ -85,3 +126,4 @@
         -"{{ http_trace_response }}"
 
       when: "'404 Not Found' not in item.stdout"
+

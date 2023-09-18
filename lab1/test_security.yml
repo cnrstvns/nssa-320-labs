@@ -5,53 +5,57 @@
 
 - name: Security Vulnerabilities Test
   hosts: web-test
-  gather_facts: no
+  gather_facts: false
   tasks:
     - name: Attempt Directory Listing
-      shell: curl -I http://192.168.206.151/resources/
+      ansible.builtin.uri:
+        url: "http://192.168.206.151/resources/"
+        method: GET
       register: directory_listing_result
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Attempt to get ETAG header
-      uri:
+      ansible.builtin.uri:
         url: "http://192.168.206.151"
         method: GET
       register: http_response
 
     - name: Check for ETag Header
-      debug:
+      ansible.builtin.debug:
         msg: "ETag header is {{ 'present' if 'ETag' in http_response.headers else 'not present' }}"
 
     # Both based on Test server IP
     - name: Attempt to Fetch Server Signature
-      shell: curl -I http://192.168.206.151/
+      ansible.builtin.uri:
+        url: "http://192.168.206.151"
+        method: GET
       register: server_signature_result
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Send HTTP TRACE Request
-      uri:
+      ansible.builtin.uri:
         url: "http://192.168.206.151/index.html"
         method: TRACE
       register: http_trace_response
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Check for TRACE Response Headers
-      debug:
+      ansible.builtin.debug:
         msg: "Cross-Site Tracing (XST) is possible!"
       when: "'TRACE' in http_trace_response.url"
 
     - name: Check Firewall Service Status
       ansible.builtin.service:
-        - name: firewalld
-          state: started
-          register: firewall_status
+        name: firewalld
+        state: started
+        register: firewall_status
 
     - name: Display Firewall Status
-      debug:
+      ansible.builtin.debug:
         var: firewall_status
 
     - name: Display Vulnerability Test Results
-      debug:
+      ansible.builtin.debug:
         var: item.stdout_lines
       with_items:
         - "{{ directory_listing_result }}"

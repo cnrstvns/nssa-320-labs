@@ -40,10 +40,6 @@
         msg: "Cross-Site Tracing (XST) is possible!"
       when: "'TRACE' in http_trace_response.url"
 
-    - name: Check Firewall Status
-      hosts: your_target_hosts
-      gather_facts: yes
-
     - name: Check Firewall Service Status
       ansible.builtin.service:
         - name: firewalld

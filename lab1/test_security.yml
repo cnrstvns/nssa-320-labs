@@ -34,10 +34,9 @@
 
     - name: Send HTTP TRACE Request
       ansible.builtin.uri:
-        url: "http://web-test/index.html"
+        url: "http://web-test"
         method: TRACE
-      register: http_trace_response
-      ignore_errors: true
+      register: trace_response
 
     - name: Check TRACE Request Response
       fail:
@@ -64,4 +63,4 @@
         - "{{ directory_listing_result }}"
         - "{{ server_signature_result }}"
         - "{{ http_response }}"
-        - "{{ http_trace_response }}"
+        - "{{ trace_response }}"

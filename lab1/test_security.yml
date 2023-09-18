@@ -28,17 +28,17 @@
 
     - name: Check for ETag Header
       ansible.builtin.debug:
-        msg: "ETag header is {{ 'present' if 'ETag' in curl_response else 'not present' }}"
+        msg: "ETag header is {{ 'present' if 'ETag' in curl_response.stdout else 'not present' }}"
 
     - name: Check for Server Header
       ansible.builtin.debug:
         msg: "Server header is present on the server."
-      when: "'Server' in curl_response.headers"
+      when: "'Server' in curl_response.stdout"
 
     - name: Check for Server Header Absence
       ansible.builtin.debug:
         msg: "Server header is not present on the server."
-      when: "'Server' not in curl_response.headers"
+      when: "'Server' not in curl_response.stdout"
 
     - name: Send HTTP TRACE Request
       ansible.builtin.uri:

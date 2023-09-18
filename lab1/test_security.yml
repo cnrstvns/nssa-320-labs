@@ -22,26 +22,22 @@
       ansible.builtin.debug:
         var: curl_response
 
+    - name: "fail early"
+      fail: "Bruh because"
+
     - name: Check for ETag Header
       ansible.builtin.debug:
         msg: "ETag header is {{ 'present' if 'ETag' in curl_response else 'not present' }}"
 
-    - name: Attempt to Fetch Server Signature
-      ansible.builtin.uri:
-        url: "http://web-test"
-        method: GET
-      register: server_signature_result
-      ignore_errors: true
-
     - name: Check for Server Header
       ansible.builtin.debug:
         msg: "Server header is present on the server."
-      when: "'Server' in server_signature_result.headers"
+      when: "'Server' in curl_response.headers"
 
     - name: Check for Server Header Absence
       ansible.builtin.debug:
         msg: "Server header is not present on the server."
-      when: "'Server' not in server_signature_result.headers"
+      when: "'Server' not in curl_response.headers"
 
     - name: Send HTTP TRACE Request
       ansible.builtin.uri:

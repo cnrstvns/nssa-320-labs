@@ -92,7 +92,7 @@
         path: /etc/httpd/conf/httpd.conf
         regexp: "^\\s*Options"
         line: "Options -Indexes"
-      notify: restart apache
+      notify: Restart apache
 
     # Prevent server information being sent in response headers
     - name: Disable Server Signature
@@ -100,7 +100,7 @@
         dest: /etc/httpd/conf/httpd.conf
         regexp: "^\\s*ServerSignature"
         line: "ServerSignature Off"
-      notify: restart apache
+      notify: Restart apache
 
     # Combat cross-site tracing attacks
     - name: Disable TRACE HTTP Request Method
@@ -108,7 +108,7 @@
         dest: /etc/httpd/conf/httpd.conf
         regexp: "^\\s*TraceEnable"
         line: "TraceEnable off"
-      notify: restart apache
+      notify: Restart apache
 
     # Prevent leaking extraneous file information
     - name: Disable ETag Information
@@ -116,7 +116,7 @@
         dest: /etc/httpd/conf/httpd.conf
         regexp: "^\\s*FileETag"
         line: "FileETag None"
-      notify: restart apache
+      notify: Restart apache
 
     # Disable unused HTTP methods
     - name: Disable Unnecessary HTTP Methods
@@ -124,7 +124,7 @@
         dest: /etc/httpd/conf/httpd.conf
         regexp: "^\\s*<LimitExcept"
         line: "<LimitExcept GET>"
-      notify: restart apache
+      notify: Restart apache
 
     # Disallow following symlinks
     - name: Use SymLinksIfOwnerMatch
@@ -132,7 +132,7 @@
         dest: /etc/httpd/conf/httpd.conf
         regexp: "^\\s*Options"
         line: "Options SymLinksIfOwnerMatch"
-      notify: restart apache
+      notify: Restart apache
 
     # Limit the request size to prevent Denial-of-Service attacks
     - name: Limit request size
@@ -140,7 +140,7 @@
         dest: /etc/httpd/conf/httpd.conf
         regexp: "^\\s*LimitRequestBody"
         line: "LimitRequestBody 102400"
-      notify: restart apache
+      notify: Restart apache
 
   handlers:
     - name: Restart apache

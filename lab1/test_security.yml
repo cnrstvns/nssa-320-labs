@@ -18,27 +18,30 @@
       ansible.builtin.shell: "curl -I -s http://web-test"
       register: curl_response
 
+    - name: Print response
+      ansible.builtin.debug:
+        msg: curl_response
+
     - name: Check for ETag Header
       ansible.builtin.debug:
         msg: "ETag header is {{ 'present' if 'ETag' in curl_response else 'not present' }}"
 
-    # Both based on Test server IP
-    # - name: Attempt to Fetch Server Signature
-    #   ansible.builtin.uri:
-    #     url: "http://web-test"
-    #     method: GET
-    #   register: server_signature_result
-    #   ignore_errors: true
+    - name: Attempt to Fetch Server Signature
+      ansible.builtin.uri:
+        url: "http://web-test"
+        method: GET
+      register: server_signature_result
+      ignore_errors: true
 
-    # - name: Check for ServerSignature Header
-    #   ansible.builtin.debug:
-    #     msg: "ServerSignature header is present on the server."
-    #   when: "'ServerSignature' in server_signature_result.headers"
+    - name: Check for Server Header
+      ansible.builtin.debug:
+        msg: "Server header is present on the server."
+      when: "'Server' in server_signature_result.headers"
 
-    # - name: Check for ServerSignature Header Absence
-    #   ansible.builtin.debug:
-    #     msg: "ServerSignature header is not present on the server."
-    #   when: "'ServerSignature' not in server_signature_result.headers"
+    - name: Check for Server Header Absence
+      ansible.builtin.debug:
+        msg: "Server header is not present on the server."
+      when: "'Server' not in server_signature_result.headers"
 
     - name: Send HTTP TRACE Request
       ansible.builtin.uri:

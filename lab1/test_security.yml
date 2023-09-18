@@ -32,6 +32,16 @@
       register: server_signature_result
       ignore_errors: true
 
+    - name: Check for ServerSignature Header
+      ansible.builtin.debug:
+        msg: "ServerSignature header is present on the server."
+      when: "'ServerSignature' in server_signature_result.headers"
+
+    - name: Check for ServerSignature Header Absence
+      ansible.builtin.debug:
+        msg: "ServerSignature header is not present on the server."
+      when: "'ServerSignature' not in server_signature_result.headers"
+
     - name: Send HTTP TRACE Request
       ansible.builtin.uri:
         url: "http://web-test"
@@ -57,12 +67,3 @@
     - name: Display Firewalld Status
       debug:
         msg: "Firewalld is {{ 'enabled' if firewall_status else 'disabled' }}"
-
-    - name: Display Vulnerability Test Results
-      ansible.builtin.debug:
-        var: item.stdout_lines
-      with_items:
-        - "{{ directory_listing_result }}"
-        - "{{ server_signature_result }}"
-        - "{{ http_response }}"
-        - "{{ trace_response_result }}"

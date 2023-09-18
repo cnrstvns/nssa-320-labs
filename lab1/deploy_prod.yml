@@ -122,8 +122,13 @@
     - name: Disable Unnecessary HTTP Methods
       ansible.builtin.lineinfile:
         dest: /etc/httpd/conf/httpd.conf
-        regexp: "^\\s*<LimitExcept"
-        line: "<LimitExcept GET>"
+        regexp: "<Directory /var/www>"
+        line: |
+          <Directory /var/www>
+            <LimitExcept GET>
+              Require all granted
+            </LimitExcept>
+          </Directory>
       notify: Restart apache
 
     # Disallow following symlinks

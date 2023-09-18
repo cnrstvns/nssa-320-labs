@@ -20,7 +20,7 @@
 
     - name: Print response
       ansible.builtin.debug:
-        msg: curl_response
+        var: curl_response
 
     - name: Check for ETag Header
       ansible.builtin.debug:

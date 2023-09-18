@@ -1,0 +1,79 @@
+# Author: NSSA Group 6 Security Team
+# Purpose: To test security vulnerabilities of our deployments
+# Date 9/17/2023
+# Version: 1.0
+
+- name: Security Vulnerabilities Test
+  hosts: web-test
+  gather_facts: no
+  tasks:
+    - name: Attempt Directory Listing
+      shell: curl -I http://192.168.206.151/resources/
+      register: directory_listing_result
+      ignore_errors: yes
+
+    - name: Attempt to get ETAG header
+      hosts: web-test
+      tasks:
+        - name: Send HTTP GET Request
+          uri:
+            url: "http://192.168.206.151"
+            method: GET
+          register: http_response
+
+        - name: Check for ETag Header
+          debug:
+            msg: "ETag header is {{ 'present' if 'ETag' in http_response.headers else 'not present' }}"
+
+    # Both based on Test server IP
+    - name: Attempt to Fetch Server Signature
+      shell: curl -I http://192.168.206.151/
+      register: server_signature_result
+      ignore_errors: yes
+
+    - name: Test for Cross-Site Tracing
+      hosts: web-test
+      tasks:
+        - name: Send HTTP TRACE Request
+          uri:
+            url: "http://192.168.206.151/index.html"
+            method: TRACE
+          register: http_trace_response
+          ignore_errors: yes
+
+        - name: Check for TRACE Response Headers
+          debug:
+            msg: "Cross-Site Tracing (XST) is possible!"
+          when: "'TRACE' in http_trace_response.url"
+
+    - name: Check Firewall Status
+      hosts: your_target_hosts
+      gather_facts: yes
+
+      tasks:
+        - name: Check Firewall Service Status
+          ansible.builtin.service:
+            - name: firewalld
+              state: started
+              register: firewall_status
+
+        - name: Display Firewall Status
+          debug:
+            var: firewall_status
+
+    - name: Report Results
+      hosts: web-test
+      gather_facts: no
+      tasks:
+        - name: Display Vulnerability Test Results
+          debug:
+            var: item.stdout_lines
+          with_items:
+            - "{{ directory_listing_result }}"
+            - "{{ server_signature_result }}"
+            - "{{ directory_listing_after_result }}"
+            - "{{ server_signature_after_result }}"
+            - "{{ http_response }}"
+            - "{{ http_trace_response }}"
+
+      when: "'404 Not Found' not in item.stdout"

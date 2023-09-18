@@ -40,12 +40,12 @@
     ignore_errors: yes
 
 - name: Test ETag Information Access
-  hosts: your_web_servers
+  hosts: web-test
   tasks:
     - name: Make HTTP Request to Check ETag
       uri:
-        url: "http://example.com/some-resource"  # Replace with the actual URL you want to test.
-        method: HEAD  # Used to retrieve headers only
+        url: "http://example.com/some-resource"  # Replace with URL
+        method: HEAD
       register: http_response
 
     - name: Debug ETag Header
@@ -53,3 +53,35 @@
         var: http_response.headers.ETag
       when: "'ETag' in http_response.headers"
 
+- name: Test for Cross-Site Tracing
+  hosts: web-test
+  tasks:
+    - name: Send HTTP TRACE Request
+      uri:
+        url: "http://example.com/some-resource"  # Replace with URL
+        method: TRACE  # Send HTTP TRACE request.
+      register: http_trace_response
+      ignore_errors: yes
+
+    - name: Check for TRACE Response Headers
+      debug:
+        msg: "Cross-Site Tracing (XST) is possible!"
+      when: "'TRACE' in http_trace_response.url"
+
+
+- name: Report Results
+  hosts: web-test
+  gather_facts: no
+  tasks:
+    - name: Display Vulnerability Test Results
+      debug:
+        var: item.stdout_lines
+      with_items:
+        - "{{ directory_listing_result }}"
+        - "{{ server_signature_result }}"
+        - "{{ directory_listing_after_result }}"
+        - "{{ server_signature_after_result }}"
+        - "{{ http_response }}"
+        -"{{ http_trace_response }}"
+
+      when: "'404 Not Found' not in item.stdout"

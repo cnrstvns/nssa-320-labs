@@ -13,17 +13,14 @@
       ignore_errors: yes
 
     - name: Attempt to get ETAG header
-      hosts: web-test
-      tasks:
-        - name: Send HTTP GET Request
-          uri:
-            url: "http://192.168.206.151"
-            method: GET
-          register: http_response
+      uri:
+        url: "http://192.168.206.151"
+        method: GET
+      register: http_response
 
-        - name: Check for ETag Header
-          debug:
-            msg: "ETag header is {{ 'present' if 'ETag' in http_response.headers else 'not present' }}"
+    - name: Check for ETag Header
+      debug:
+      msg: "ETag header is {{ 'present' if 'ETag' in http_response.headers else 'not present' }}"
 
     # Both based on Test server IP
     - name: Attempt to Fetch Server Signature

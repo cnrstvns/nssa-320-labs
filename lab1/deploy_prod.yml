@@ -126,26 +126,6 @@
         line: "FileETag None"
       notify: Restart apache
 
-    # Disable unused HTTP methods
-    - name: Disable Unnecessary HTTP Methods
-      ansible.builtin.lineinfile:
-        dest: /etc/httpd/conf/httpd.conf
-        state: absent
-        insertafter: '<Directory "/var/www">'
-        line: "Require all granted"
-      notify: Restart apache
-
-    # Disable unused HTTP methods
-    - name: Disable Unnecessary HTTP Methods
-      ansible.builtin.lineinfile:
-        dest: /etc/httpd/conf/httpd.conf
-        insertafter: '<Directory "/var/www">'
-        line: |
-          <LimitExcept GET>
-            Require all granted
-          </LimitExcept>
-      notify: Restart apache
-
     # Disallow following symlinks
     - name: Use SymLinksIfOwnerMatch
       ansible.builtin.lineinfile:

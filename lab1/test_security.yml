@@ -20,7 +20,7 @@
 
     - name: Check for ETag Header
       debug:
-      msg: "ETag header is {{ 'present' if 'ETag' in http_response.headers else 'not present' }}"
+        msg: "ETag header is {{ 'present' if 'ETag' in http_response.headers else 'not present' }}"
 
     # Both based on Test server IP
     - name: Attempt to Fetch Server Signature

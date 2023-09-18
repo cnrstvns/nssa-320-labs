@@ -48,11 +48,6 @@
       ansible.builtin.service:
         name: firewalld
         state: started
-        register: firewall_status
-
-    - name: Display Firewall Status
-      ansible.builtin.debug:
-        var: firewall_status
 
     - name: Display Vulnerability Test Results
       ansible.builtin.debug:

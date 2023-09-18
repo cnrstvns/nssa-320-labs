@@ -1,0 +1,28 @@
+---
+- name: Test Vulnerabilities Before Applying Security
+ #Author: NSSA Group 6 Security Team
+ #Purpose: To test security vulnerabilities of our deployments
+ #Date 9/17/2023
+ #Version: 1.0
+  hosts: your_web_server
+  gather_facts: no
+  tasks:
+    - name: Attempt Directory Listing
+      shell: curl -I http://your_server_ip/directory_with_no_index/
+      register: directory_listing_result
+      ignore_errors: yes
+
+    - name: Attempt to Fetch Server Signature
+      shell: curl -I http://your_server_ip/
+      register: server_signature_result
+      ignore_errors: yes
+
+    # Add tasks for other vulnerability tests here
+
+- name: Apply Secure Production Playbook
+  hosts: your_web_server
+  gather_facts: no
+  tasks:
+    - name: Run secure-prod-web.yml playbook
+      include_tasks: secure-prod-web.yml
+

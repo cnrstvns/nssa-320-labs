@@ -102,6 +102,14 @@
         line: "ServerSignature Off"
       notify: Restart apache
 
+    # Prevent server version being sent in response headers
+    - name: Disable Server Tokens
+      ansible.builtin.lineinfile:
+        dest: /etc/httpd/conf/httpd.conf
+        regexp: "^\\s*SeverTokens"
+        line: "SeverTokens Prod"
+      notify: Restart apache
+
     # Combat cross-site tracing attacks
     - name: Disable TRACE HTTP Request Method
       ansible.builtin.lineinfile:

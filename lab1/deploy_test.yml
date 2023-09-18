@@ -94,12 +94,20 @@
         line: "Options -Indexes"
       notify: Restart apache
 
-    # Prevent server information being sent in response headers
+    # Prevent server version being sent in response headers
     - name: Disable Server Signature
       ansible.builtin.lineinfile:
         dest: /etc/httpd/conf/httpd.conf
         regexp: "^\\s*ServerSignature"
         line: "ServerSignature Off"
+      notify: Restart apache
+
+    # Prevent server version being sent in response headers
+    - name: Disable Server Tokens
+      ansible.builtin.lineinfile:
+        dest: /etc/httpd/conf/httpd.conf
+        regexp: "^\\s*SeverTokens"
+        line: "SeverTokens Prod"
       notify: Restart apache
 
     # Combat cross-site tracing attacks

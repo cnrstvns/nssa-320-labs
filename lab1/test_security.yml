@@ -42,14 +42,16 @@
       debug:
         msg: "TRACE requests are allowed on the server."
       when: "trace_response.status == 200"
+      register: trace_response_result
 
     - name: Check TRACE Request Response
       debug:
         msg: "TRACE requests are not allowed on the server. Status code: {{ trace_response.status }}"
       when: "trace_response.status != 200"
+      register: trace_response_result
 
     - name: Check Firewall Service Status
-      ansible.builtin.command: "systemctl status firewalld | grep -oP 'Active: \\K\\W+'"
+      ansible.builtin.shell: "systemctl status firewalld | grep -oP 'Active: \\K\\W+'"
       register: firewall_status
 
     - name: Display Firewalld Status
@@ -63,4 +65,4 @@
         - "{{ directory_listing_result }}"
         - "{{ server_signature_result }}"
         - "{{ http_response }}"
-        - "{{ trace_response }}"
+        - "{{ trace_response_result }}"

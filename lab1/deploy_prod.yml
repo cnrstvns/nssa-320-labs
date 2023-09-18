@@ -101,7 +101,6 @@
         regexp: "^\\s*ServerSignature"
         line: "ServerSignature Off"
       notify: Restart apache
-      when: not('ServerSignature Off' in lookup('file', '~/etc/httpd/conf/httpd.conf'))
 
     # Prevent server version being sent in response headers
     - name: Disable Server Tokens
@@ -110,7 +109,6 @@
         regexp: "^\\s*ServerTokens"
         line: "ServerTokens Prod"
       notify: Restart apache
-      when: not('ServerTokens Prod' in lookup('file', '~/etc/httpd/conf/httpd.conf'))
 
     # Combat cross-site tracing attacks
     - name: Disable TRACE HTTP Request Method
@@ -119,7 +117,6 @@
         regexp: "^\\s*TraceEnable"
         line: "TraceEnable off"
       notify: Restart apache
-      when: not('TraceEnable off' in lookup('file', '~/etc/httpd/conf/httpd.conf'))
 
     # Prevent leaking extraneous file information
     - name: Disable ETag Information
@@ -128,7 +125,6 @@
         regexp: "^\\s*FileETag"
         line: "FileETag None"
       notify: Restart apache
-      when: not('FileETag None' in lookup('file', '~/etc/httpd/conf/httpd.conf'))
 
     # Disable unused HTTP methods
     - name: Disable Unnecessary HTTP Methods
@@ -138,7 +134,6 @@
         insertafter: '<Directory "/var/www">'
         line: "Require all granted"
       notify: Restart apache
-      when: not('LimitExcept GET' in lookup('file', '~/etc/httpd/conf/httpd.conf'))
 
     # Disable unused HTTP methods
     - name: Disable Unnecessary HTTP Methods
@@ -150,7 +145,6 @@
             Require all granted
           </LimitExcept>
       notify: Restart apache
-      when: not('LimitExcept GET' in lookup('file', '~/etc/httpd/conf/httpd.conf'))
 
     # Disallow following symlinks
     - name: Use SymLinksIfOwnerMatch
@@ -159,7 +153,6 @@
         regexp: "^\\s*Options"
         line: "Options SymLinksIfOwnerMatch"
       notify: Restart apache
-      when: not('Options SymLinksIfOwnerMatch' in lookup('file', '~/etc/httpd/conf/httpd.conf'))
 
     # Limit the request size to prevent Denial-of-Service attacks
     - name: Limit request size
@@ -168,7 +161,6 @@
         regexp: "^\\s*LimitRequestBody"
         line: "LimitRequestBody 102400"
       notify: Restart apache
-      when: not('LimitRequestBody' in lookup('file', '~/etc/httpd/conf/httpd.conf'))
 
   handlers:
     - name: Restart apache

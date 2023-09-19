@@ -1,3 +1,8 @@
+# Author: NSSA320 Group 6 Operations Team
+# Purpose: To test stability under load of our web servers
+# Date 9/18/2023
+# Version: 1.0
+
 - name: Load test web server
   hosts: siege_server
   become: true
@@ -17,9 +22,9 @@
       become: true
 
     - name: Run siege against server
-      ansible.builtin.shell: "siege -c 100 -t 1m | tail -n 0"
+      ansible.builtin.shell: "siege -c 100 -t 10s"
       register: siege_result
 
     - name: Display siege result
       debug:
-        var: siege_result.stdout
+        var: siege_result.stdout_lines[-10]

@@ -22,4 +22,4 @@
 
     - name: Display siege result
       debug:
-        var: siege_result
+        var: siege_result.stdout

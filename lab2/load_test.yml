@@ -27,6 +27,11 @@
         state: directory
         mode: "0755"
 
+    - name: Remove siege log file
+      ansible.builtin.file:
+        path: /var/log/siege/siege.log
+        state: absent
+
     - name: Run siege against server
       ansible.builtin.command: "siege -c 100 -t 1m --log=/var/log/siege/siege.log"
 

@@ -1,5 +1,5 @@
 - name: Load test web server
-  hosts: test
+  hosts: siege-server
   become: true
   tasks:
     - name: Install Siege

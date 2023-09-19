@@ -13,12 +13,13 @@
         state: present
 
     - name: Add URL to siege configuration
-      ansible.builtin.shell: 'echo "http://web-test" > /etc/siege/urls.txt'
+      ansible.builtin.shell: 'echo "http://192.168.194.81" > /etc/siege/urls.txt'
       become: true
 
     - name: Run siege against server
       ansible.builtin.command: "siege -c 100 -t 1m | tail -n 0"
       register: siege_result
+      become: true
 
     - name: Display siege result
       debug:

@@ -31,8 +31,7 @@
       ansible.builtin.command: "siege -c 100 -t 1m --log=/var/log/siege/siege.log"
 
     - name: Display siege results
-      ansible.builtin.cat:
-        path: /var/log/siege/siege.log"
+      ansible.builtin.shell: "cat /var/log/siege/siege.log"
       register: log_contents
 
     - name: Print log file contents

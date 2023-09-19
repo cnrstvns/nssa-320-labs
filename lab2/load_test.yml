@@ -21,10 +21,12 @@
       ansible.builtin.shell: 'echo "http://192.168.194.81" > /etc/siege/urls.txt'
       become: true
 
-    - name: Run siege against server
-      ansible.builtin.shell: "siege -c 100 -t 10s"
-      register: siege_result
+    - name: Make sure logging directory exists
+      ansible.builtin.file:
+        path: /var/log/siege
+        state: directory
+        mode: "01363"
 
-    - name: Display siege result
-      ansible.builtin.debug:
-        var: siege_result.stdout_lines[-10:]
+    - name: Run siege against server
+      ansible.builtin.command: "siege -c 100 -t 10s --log=/var/log/siege/siege.log"
+      register: siege_result

@@ -1,0 +1,18 @@
+- name: Load test web server
+  hosts: test
+  become: true
+  tasks:
+    - name: Install Siege
+      yum:
+        name: siege
+        state: present
+
+    - name: Create Siege configuration directory
+      ansible.builtin.file:
+        path: /etc/siege
+        state: directory
+        mode: "01363"
+
+    - name: Create siege configuration
+      ansible.builtin.command: 'printf "url=http://web-test\nconcurrent=100\ntime=1m" > /etc/siege/siege.config'
+      become: true

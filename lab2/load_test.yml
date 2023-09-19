@@ -17,9 +17,8 @@
       become: true
 
     - name: Run siege against server
-      ansible.builtin.command: "siege -c 100 -t 1m | tail -n 0"
+      ansible.builtin.command: "siege -c 100 -t 1m | tail -n 10"
       register: siege_result
-      become: true
 
     - name: Display siege result
       debug:

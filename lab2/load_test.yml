@@ -15,3 +15,11 @@
     - name: Add URL to siege configuration
       ansible.builtin.shell: 'echo "http://web-test" > /etc/siege/urls.txt'
       become: true
+
+    - name: Run siege against server
+      ansible.builtin.command: "siege -c 100 -t 1m"
+      register: siege_result
+
+    - name: Display siege result
+      debug:
+        var: siege_result

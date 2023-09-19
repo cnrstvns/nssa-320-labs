@@ -13,5 +13,5 @@
         state: present
 
     - name: Add URL to siege configuration
-      ansible.builtin.command: 'echo "url=http://web-test" > /etc/siege/urls.txt'
+      ansible.builtin.shell: 'echo "http://web-test" > ~/etc/siege/urls.txt'
       become: true

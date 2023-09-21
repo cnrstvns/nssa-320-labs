@@ -1,104 +1,25 @@
 - name: Install Zabbix on CentOS 7
-  hosts: Zabbix
+  hosts: your_target_server
   become: yes  # Use sudo to execute commands as root
 
   tasks:
-    - name: Install EPEL repository
+    - name: Install Zabbix repository RPM
       yum:
-        name: epel-release
+        name: https://repo.zabbix.com/zabbix/5.4/rhel/7/x86_64/zabbix-release-5.4-1.el7.noarch.rpm
         state: present
 
-    - name: Install required packages
+    - name: Install Zabbix Server and Agent
       yum:
         name:
-          - httpd
-          - mariadb-server
-          - mariadb
-          - mariadb-devel
-          - php
-          - php-bcmath
-          - php-gd
-          - php-ldap
-          - php-mbstring
-          - php-mysql
-          - php-xml
-          - php-mcrypt
           - zabbix-server-mysql
-          - zabbix-web-mysql
           - zabbix-agent
         state: present
 
-    - name: Enable and start services
+    - name: Start and enable Zabbix services
       systemd:
         name: "{{ item }}"
         enabled: yes
         state: started
       loop:
-        - httpd
-        - mariadb
         - zabbix-server
         - zabbix-agent
-
-    - name: Set up MariaDB for Zabbix
-      command: mysql_secure_installation
-      args:
-        creates: /root/.mysql_secret
-      environment:
-        MYSQL_ROOT_PASSWORD: student
-        MYSQL_DB_PASSWORD: student
-      when: "'/root/.mysql_secret' not in ansible_facts.files"
-
-    - name: Create Zabbix database
-      mysql_db:
-        name: zabbix
-        state: present
-      when: "'/root/.mysql_secret' not in ansible_facts.files"
-
-    - name: Import Zabbix database schema
-      mysql_db:
-        name: zabbix
-        state: import
-        target: /usr/share/doc/zabbix-server-mysql-*/create.sql.gz
-      when: "'/root/.mysql_secret' not in ansible_facts.files"
-
-    - name: Configure Zabbix server
-      lineinfile:
-        path: /etc/zabbix/zabbix_server.conf
-        regexp: "{{ item.regexp }}"
-        line: "{{ item.line }}"
-      loop:
-        - { regexp: '^DBHost=', line: 'DBHost=localhost' }
-        - { regexp: '^DBName=', line: 'DBName=zabbix' }
-        - { regexp: '^DBUser=', line: 'DBUser=zabbix' }
-        - { regexp: '^DBPassword=', line: 'DBPassword={{ your_zabbix_db_password }}' }
-
-    - name: Set PHP timezone in Zabbix frontend
-      lineinfile:
-        path: /etc/httpd/conf.d/zabbix.conf
-        regexp: 'php_value date.timezone'
-        line: 'php_value date.timezone = {{ your_timezone }}'
-      vars:
-        your_timezone: 'Your_Timezone_Here'
-        
-    - name: Restart Apache and Zabbix
-      systemd:
-        name: "{{ item }}"
-        state: restarted
-      loop:
-        - httpd
-        - zabbix-server
-
-    - name: Enable Zabbix agent
-      systemd:
-        name: zabbix-agent
-        enabled: yes
-        state: started
-
-  vars:
-    your_zabbix_db_password: student  # Replace with your desired database password
-
-  handlers:
-    - name: Reload Apache
-      systemd:
-        name: httpd
-        state: reloaded

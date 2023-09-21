@@ -9,7 +9,7 @@
         state: present
         
     - name: Install shell
-       ansible.builtin.command: dpkg -i zabbix-release_5.0-1+focal_all.deb
+      ansible.builtin.command: dpkg -i zabbix-release_5.0-1+focal_all.deb
 
     - name: Install Zabbix Server and Agent
       yum:

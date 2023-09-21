@@ -1,0 +1,42 @@
+- name: Install Zabbix
+  hosts: your_target_servers
+  become: yes  # Use sudo to execute commands as root
+
+  tasks:
+    - name: Update package cache (Debian/Ubuntu)
+      apt:
+        update_cache: yes
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+    - name: Install Zabbix repository key (Debian/Ubuntu)
+      apt_key:
+        url: https://repo.zabbix.com/zabbix-official-repo.key
+        state: present
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+    - name: Add Zabbix APT repository (Debian/Ubuntu)
+      apt_repository:
+        repo: "deb https://repo.zabbix.com/zabbix/{{ zabbix_version }}/ubuntu {{ ansible_distribution_release }} main"
+        state: present
+      vars:
+        zabbix_version: 5.4  # Change to the desired Zabbix version
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+    - name: Update package cache (CentOS/RHEL)
+      yum:
+        name: '*'
+        state: latest
+      when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
+
+    - name: Install Zabbix repository RPM (CentOS/RHEL)
+      yum:
+        name: https://repo.zabbix.com/zabbix-official-repo.rpm
+        state: present
+      when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
+
+    - name: Install Zabbix Server and Agent
+      package:
+        name:
+          - zabbix-server-mysql
+          - zabbix-agent
+      state: present

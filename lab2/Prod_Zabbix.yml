@@ -1,5 +1,5 @@
 - name: Install Zabbix on CentOS 7
-  hosts: your_target_server
+  hosts: Zabbix
   become: yes  # Use sudo to execute commands as root
 
   tasks:

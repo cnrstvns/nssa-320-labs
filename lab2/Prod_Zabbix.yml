@@ -1,5 +1,5 @@
 - name: Install and Start Zabbix
-  hosts: your_target_server
+  hosts: Zabbix
   become: yes
   tasks:
     - name: Install Zabbix repository RPM

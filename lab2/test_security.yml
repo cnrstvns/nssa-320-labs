@@ -60,4 +60,17 @@
 
 #Original Tests above^^
 #Lab 2 tested added below
-    
+    - name: Test for Released Candidates
+      hosts: your_web_servers
+      tasks:
+        - name: Test for RC1
+          uri:
+            url: "http://web-test"
+            method: GET
+          register: rc1_response
+          ignore_errors: yes
+
+        - name: Report RC Versions
+          debug:
+            msg: "Released Candidate found: {{ item.url }}"
+          when: item.status == 200

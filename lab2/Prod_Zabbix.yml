@@ -1,4 +1,4 @@
-name: Install and Start Zabbix
+- name: Install and Start Zabbix
   hosts: your_target_server
   become: yes
   tasks:

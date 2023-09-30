@@ -18,10 +18,10 @@
       yum:
         name: zabbix-agent
         state: latest
-    - name: copy zabbix agentd.conf file
-      ansible.builtin.copy:
-        src: zabbix_agentd.conf
-        dest: /etc/zabbix/zabbix_agentd.conf
+   # - name: copy zabbix agentd.conf file
+      #ansible.builtin.copy:
+      #  src: zabbix_agentd.conf
+      #  dest: /etc/zabbix/zabbix_agentd.conf
     - name: Start Zabbix service
       ansible.builtin.service:
         name: zabbix-agent

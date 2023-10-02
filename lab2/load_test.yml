@@ -1,4 +1,4 @@
-# Author: NSSA320 Group 6 Operations Team
+# Author: NSSA320 Group 6 Operations (and security) Team(s)
 # Purpose: To test stability under load of our web servers
 # Date 9/18/2023
 # Version: 1.0
@@ -6,6 +6,10 @@
 - name: Load test web server
   hosts: siege_server
   become: true
+  vars: 
+    web_server_ip: "192.168.204.95"
+    num_simul_users: 200
+    time: "1m"
   tasks:
     - name: Install epel-release
       yum:
@@ -18,7 +22,7 @@
         state: present
 
     - name: Add URL to siege configuration
-      ansible.builtin.shell: 'echo "http://192.168.194.81" > /etc/siege/urls.txt'
+      ansible.builtin.shell: 'echo "{{web_server_ip}}" > /etc/siege/urls.txt'
       become: true
 
     - name: Make sure logging directory exists
@@ -33,7 +37,7 @@
         state: absent
 
     - name: Run siege against server
-      ansible.builtin.command: "siege -c 100 -t 1m --log=/var/log/siege/siege.log"
+      ansible.builtin.command: "siege -c {{num_simul_users}} -t {{time}} --log=/var/log/siege/siege.log"
 
     - name: Display siege results
       ansible.builtin.shell: "cat /var/log/siege/siege.log"

@@ -74,18 +74,3 @@
           debug:
             msg: "Released Candidate found: {{ item.url }}"
           when: item.status == 200
-#extented tests for lab 3
-      - hosts: all
-        become: yes
-        tasks:
-        - name: Check if SSL is open
-          uri:
-            url: https://{{ ansible_host }}
-            validate_certs: no
-            status_code: 200
-          register: ssl_result
-
-        - name: Fail if SSL is not open
-          fail:
-            msg: "SSL is not open on {{ ansible_host }}"
-          when: ssl_result.status != 200

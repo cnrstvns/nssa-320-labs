@@ -15,7 +15,7 @@
     - name: Configure HAProxy
       ansible.builtin.lineinfile:
         path: /etc/haproxy/haproxy.cfg
-        line: "\nfrontend web_front\n\tbind *:80\n\tdefault_backend web_back\n\nbackend web_back\n\tbalance roundrobin\n\tserver web_prod_a 192.168.206.152:80 check\n\tserver web_prod_b 192.168.205.223:80 check\n"
+        line: "\nfrontend web_front\n\tbind *:80\n\tdefault_backend web_back\n\nbackend web_back\n\tbalance roundrobin\n\tserver web_prod_a 192.168.206.152:80 check\n\tserver web_prod_b 192.168.205.223:80 check\n\tserver web_prod_c 192.168.199.237:80 check\n"
         state: present
 
     - name: Open HTTP Port 80

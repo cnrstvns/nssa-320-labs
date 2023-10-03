@@ -1,0 +1,33 @@
+# Author: NSSA-320 Group 6 Operations Team
+# Purpose: Deploy HAProxy Server
+# Date: 10/02/2023
+# Version: 1
+
+- name: Deploy Proxy Server
+  hosts: web_loadbalancer
+  become: true
+  tasks:
+    - name: Install HAProxy
+      yum:
+        name: haproxy
+        state: present
+
+    - name: Configure HAProxy
+      ansible.builtin.lineinfile:
+        path: /etc/haproxy/haproxy.cfg
+        line: "frontend main\n bind *:80\n\nbackend app\n balance roundrobin\n server web_prod_a 192.168.206.152:80 check\n server web_prod_b 192.168.205.223:80 check\n"
+        state: present
+
+    - name: Open HTTP Port 80
+      firewalld:
+        service: http
+        permanent: true
+        state: enabled
+
+    - name: Reload Firewall
+      ansible.builtin.command: firewall-cmd --reload
+
+    - name: Restart HAProxy
+      ansible.builtin.service:
+        name: haproxy
+        state: restarted

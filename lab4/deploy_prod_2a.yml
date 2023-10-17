@@ -1,0 +1,149 @@
+# Author: NSSA-320 Group 6 Operations Team
+# Purpose: To deploy to the production server, install apache open port 80 and install the explore california website
+# Date: 10/17/2023
+# Version: 1.1
+
+- name: Deploy Production Server
+  hosts: web_prod_2a
+  become: true
+  tasks:
+    - name: Install Apache
+      yum:
+        name: httpd
+        state: present
+
+    - name: Start Apache
+      ansible.builtin.service:
+        name: httpd
+        state: started
+
+    - name: Enable Apache
+      ansible.builtin.service:
+        name: httpd
+        enabled: true
+
+    - name: Open HTTP Port 80
+      firewalld:
+        service: http
+        permanent: true
+        state: enabled
+
+    - name: Reload Firewall
+      ansible.builtin.command: firewall-cmd --reload
+
+    - name: Ensure Git is installed
+      ansible.builtin.yum:
+        name: git
+        state: present
+
+    - name: Remove existing repository
+      ansible.builtin.file:
+        path: ~/Documents/labs
+        state: absent
+
+    - name: Download website
+      ansible.builtin.git:
+        repo: https://github.com/cnrstvns/nssa-320-labs
+        dest: ~/Documents/labs
+        clone: true
+        update: true
+        force: true
+
+    - name: Find files to Remove
+      ansible.builtin.find:
+        paths: /var/www/html/
+        recurse: true
+        file_type: any
+      register: items_to_remove
+
+    - name: Remove old site files
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      with_items: "{{ items_to_remove.files }}"
+
+    - name: Remove old site directories
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      with_items: "{{ items_to_remove.directories }}"
+      when: items_to_remove.directories is defined
+
+    - name: Move site files
+      ansible.builtin.shell:
+        cmd: mv -f ~/Documents/labs/lab1/explore_california/* /var/www/html/
+      args:
+        warn: false
+
+    - name: Update permissions
+      ansible.builtin.command: chcon -R -t httpd_sys_content_t /var/www/html/
+      become: true
+
+    - name: Restart Apache
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+
+    # Security additions
+
+    # Prevent extraneous files from being exposed
+    - name: Disable directory listing
+      ansible.builtin.lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: "^\\s*Options"
+        line: "Options -Indexes"
+      notify: Restart apache
+
+    # Prevent server information being sent in response headers
+    - name: Disable Server Signature
+      ansible.builtin.lineinfile:
+        dest: /etc/httpd/conf/httpd.conf
+        regexp: "^\\s*ServerSignature"
+        line: "ServerSignature Off"
+      notify: Restart apache
+
+    # Prevent server version being sent in response headers
+    - name: Disable Server Tokens
+      ansible.builtin.lineinfile:
+        dest: /etc/httpd/conf/httpd.conf
+        regexp: "^\\s*ServerTokens"
+        line: "ServerTokens Prod"
+      notify: Restart apache
+
+    # Combat cross-site tracing attacks
+    - name: Disable TRACE HTTP Request Method
+      ansible.builtin.lineinfile:
+        dest: /etc/httpd/conf/httpd.conf
+        regexp: "^\\s*TraceEnable"
+        line: "TraceEnable off"
+      notify: Restart apache
+
+    # Prevent leaking extraneous file information
+    - name: Disable ETag Information
+      ansible.builtin.lineinfile:
+        dest: /etc/httpd/conf/httpd.conf
+        regexp: "^\\s*FileETag"
+        line: "FileETag None"
+      notify: Restart apache
+
+    # Disallow following symlinks
+    - name: Use SymLinksIfOwnerMatch
+      ansible.builtin.lineinfile:
+        dest: /etc/httpd/conf/httpd.conf
+        regexp: "^\\s*Options"
+        line: "Options SymLinksIfOwnerMatch"
+      notify: Restart apache
+
+    # Limit the request size to prevent Denial-of-Service attacks
+    - name: Limit request size
+      ansible.builtin.lineinfile:
+        dest: /etc/httpd/conf/httpd.conf
+        regexp: "^\\s*LimitRequestBody"
+        line: "LimitRequestBody 102400"
+      notify: Restart apache
+
+  handlers:
+    - name: Restart apache
+      ansible.builtin.service:
+        name: httpd
+        state: restarted

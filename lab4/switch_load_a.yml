@@ -1,0 +1,25 @@
+# Author: NSSA-320 Group 6 Operations Team
+# Purpose: Use A servers for load balancer
+# Date: 10/17/2023
+# Version: 1
+
+- hosts: web_loadbalancer
+  become: true
+  tasks:
+    - name: Update to use A servers in haproxy.cfg
+      blockinfile:
+        path: /etc/haproxy/haproxy.cfg
+        marker: "{mark}"
+        marker_begin: "# ANSIBLE START"
+        marker_end: "# ANSIBLE END"
+        block: |
+          backend web_back
+            balance roundrobin
+            server prod-web1 192.168.201.207:80 check
+            server prod-web2 192.168.203.91:80 check
+            server prod-web3 192.168.202.157:80 check
+
+    - name: Restart haproxy
+      service:
+        name: haproxy
+        state: restarted

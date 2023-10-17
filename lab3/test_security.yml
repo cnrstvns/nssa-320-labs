@@ -74,3 +74,18 @@
           debug:
             msg: "Released Candidate found: {{ item.url }}"
           when: item.status == 200
+#extented tests for lab 3
+      - hosts: all
+        become: yes
+        tasks:
+        - name: Check if SSL is open
+          uri:
+            url: "https://web-test"
+            validate_certs: no
+            status_code: 200
+          register: ssl_result
+
+        - name: Fail if SSL is not open
+          fail:
+            msg: "SSL is not open on {{ item.url }}"
+          when: ssl_result.status != 200
